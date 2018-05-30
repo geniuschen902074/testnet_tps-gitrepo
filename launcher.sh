@@ -31,6 +31,3 @@ cp setup Node/
 #copy Node/ to each client container's folder
 #run up each client container
 #in each of them, new core and Node/Node.cpp is compiled and run
-cd Node/
-g++ -std=c++11 Node.cpp -o Node
-./Node
