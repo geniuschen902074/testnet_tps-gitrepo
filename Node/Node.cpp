@@ -237,6 +237,8 @@ int main(int argc, char *argv[]){
     strcpy(CMD[2], "./mineblock.sh %d");//
     strcpy(CMD[3], "./setaddress.sh %d");//(ascii string)
     strcpy(CMD[4], "./txInmempool.sh");//atoi
+    //in newer bitcoin, gettxoutsetinfo
+    //in newer bitcoin, getblockchaininfo
     strcpy(CMD[5], "./getchaintip.sh");//atoi (longest height -> #branch)
     strcpy(CMD[6], "./settxfee.sh %d %.7f");
     strcpy(CMD[7], "./getbestchaintps.sh %d");//science notation ascii string
