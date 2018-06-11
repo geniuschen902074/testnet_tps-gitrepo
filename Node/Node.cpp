@@ -239,7 +239,7 @@ int main(int argc, char *argv[]){
     strcpy(CMD[4], "./txInmempool.sh");//atoi
     strcpy(CMD[5], "./getchaintip.sh");//atoi (longest height -> #branch)
     strcpy(CMD[6], "./settxfee.sh %d %.7f");
-    strcpy(CMD[7], "./getbestchaintps.sh");//science notation ascii string
+    strcpy(CMD[7], "./getbestchaintps.sh %d");//science notation ascii string
 
 
     //std::thread monitor( node_monitor , num_node);//master node aside from the num_node nodes
