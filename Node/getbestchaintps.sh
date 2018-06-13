@@ -2,4 +2,4 @@
 
 num_blk=$1
 
-bitcoin-cli  -rpcuser=test -rpcpassword=test getbestchaintps $num_blk
+bitcoin-cli -rpcport=18332 -rpcuser=test -rpcpassword=test getbestchaintps $num_blk

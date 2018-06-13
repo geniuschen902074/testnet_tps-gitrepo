@@ -95,10 +95,11 @@ void node_monitor(int num_node){
 
 char dnsholder[256];
 char selfaddress[256];
-void findaddress(int sockfd, MSG *buf_send, void *buf_recv)
+void findaddress(int sockfd, MSG *buf_send, void **buf_recv)
 {
     send(sockfd, buf_send, sizeof(MSG), 0);
-    recv(sockfd, buf_recv, sizeof(MSG), 0);
+    recv(sockfd, *buf_recv, sizeof(MSG), 0);
+    close(sockfd);
 }
 struct in_addr getdnsholderip(char *dnsholder){
     
@@ -145,7 +146,7 @@ void matching(unsigned long long int randseed, unsigned int order)
     MSG *buf_send = new MSG();
     void *buf_recv = malloc(1 * sizeof(MSG));
     buf_send->op = REQUEST_BTCADDR;
-    sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    //sockfd = socket(PF_INET, SOCK_STREAM, 0);
     bzero(&dest, sizeof(dest));
     dest.sin_family = PF_INET;
     dest.sin_port = htons(5566);
@@ -153,7 +154,7 @@ void matching(unsigned long long int randseed, unsigned int order)
     //dest.sin_addr.s_addr = inet_addr(dnsseed);
     dest.sin_addr = getdnsholderip(dnsholder);
     /******************/
-    connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+    //connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
 
     std::mt19937 mt(randseed);
     std::exponential_distribution<double> exp(0.1);
@@ -166,13 +167,15 @@ void matching(unsigned long long int randseed, unsigned int order)
         while((j--) > 0) ;
 
         /* request address to send */
-        findaddress(sockfd, buf_send, buf_recv);
-        char *addr = ((MSG *)buf_recv)->message;
+        sockfd = socket(PF_INET, SOCK_STREAM, 0);
+        connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+        findaddress(sockfd, buf_send, &buf_recv);
+        char *addr = ((MSG *)buf_recv)->message; //printf("btcaddr %s\n", addr);
         
         /* TODO fill in 4th parameter of sendMoney below according to balance */
         double balance = checkbalance();
         /* send the money */
-        setshellcmdoutput(NULL, 0, addr, 0.01);//paytxfee when running core?
+        //TODO setshellcmdoutput(NULL, 0, addr, 0.01);//paytxfee when running core?
 
     } while(1);
 }
@@ -190,10 +193,11 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     dest.sin_port = htons(5566);
     /******************/
     //dest.sin_addr.s_addr = inet_addr(dnsseed);
-    dest.sin_addr = getdnsholderip(dnsholder);
+    dest.sin_addr = getdnsholderip(dnsholder); //printf("%s\n", inet_ntoa(dest.sin_addr));
     /******************/
     connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
     send(sockfd, buf_send, sizeof(MSG), 0);
+    close(sockfd);
     sleep(3);
     /* run core */
     char command[280];
@@ -207,10 +211,12 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     fflush(fd); pclose(fd);
     /* report BTC address */
     buf_send->op = REGISTER_BTCADDR;
-    strcpy(buf_send->message, selfaddress);
+    strcpy(buf_send->message, selfaddress); //printf("%s\n", buf_send->message);
+    sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
     send(sockfd, buf_send, sizeof(MSG), 0);
-
     close(sockfd);
+
     delete buf_send;
     
     /* fork miner process */
@@ -220,7 +226,7 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
         /* [when] balance, run */
         /* TODO mine the block */
         
-        
+        exit(0);
     }
 
     /* starting matching */
@@ -237,8 +243,6 @@ int main(int argc, char *argv[]){
     strcpy(CMD[2], "./mineblock.sh %d");//
     strcpy(CMD[3], "./setaddress.sh %d");//(ascii string)
     strcpy(CMD[4], "./txInmempool.sh");//atoi
-    //in newer bitcoin, gettxoutsetinfo
-    //in newer bitcoin, getblockchaininfo
     strcpy(CMD[5], "./getchaintip.sh");//atoi (longest height -> #branch)
     strcpy(CMD[6], "./settxfee.sh %d %.7f");
     strcpy(CMD[7], "./getbestchaintps.sh %d");//science notation ascii string
