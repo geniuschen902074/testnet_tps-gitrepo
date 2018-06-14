@@ -163,14 +163,14 @@ void matching(unsigned long long int randseed, unsigned int order)
         double r = exp(mt);
         long interval = (long)(r * (double)order);
         /* wait */
-        long j = interval;
+        long j = interval; //printf("%ld\n", j);
         while((j--) > 0) ;
 
         /* request address to send */
         sockfd = socket(PF_INET, SOCK_STREAM, 0);
         connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
         findaddress(sockfd, buf_send, &buf_recv);
-        char *addr = ((MSG *)buf_recv)->message; //printf("btcaddr %s\n", addr);
+        char *addr = ((MSG *)buf_recv)->message; printf("btcaddr %s\n", addr);
         
         /* TODO fill in 4th parameter of sendMoney below according to balance */
         double balance = checkbalance();
@@ -182,7 +182,7 @@ void matching(unsigned long long int randseed, unsigned int order)
 
 void startnode(unsigned long long int randseed, unsigned int order, char *datadir)
 {
-    /* report ip */
+
     int sockfd;
     struct sockaddr_in dest;
     MSG *buf_send = new MSG();
@@ -193,12 +193,9 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     dest.sin_port = htons(5566);
     /******************/
     //dest.sin_addr.s_addr = inet_addr(dnsseed);
-    dest.sin_addr = getdnsholderip(dnsholder); //printf("%s\n", inet_ntoa(dest.sin_addr));
+    dest.sin_addr = getdnsholderip(dnsholder); printf("%s\n", inet_ntoa(dest.sin_addr));
     /******************/
-    connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
-    send(sockfd, buf_send, sizeof(MSG), 0);
-    close(sockfd);
-    sleep(3);
+
     /* run core */
     char command[280];
     snprintf(command, 280, "./startnoderob.sh %s", datadir);//mintxfee, minrelaytxfee
@@ -208,10 +205,10 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     FILE *fd;
     setshellcmdoutput(&fd, 3, 1);
     fgets(selfaddress, 256, fd); selfaddress[strlen(selfaddress)-1] = '\0';//[pop_back]
-    fflush(fd); pclose(fd);
+    fflush(fd); pclose(fd); printf("%s\n", selfaddress);
     /* report BTC address */
     buf_send->op = REGISTER_BTCADDR;
-    strcpy(buf_send->message, selfaddress); //printf("%s\n", buf_send->message);
+    strcpy(buf_send->message, selfaddress); printf("%s\n", buf_send->message);
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
     connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
     send(sockfd, buf_send, sizeof(MSG), 0);
@@ -271,6 +268,28 @@ int main(int argc, char *argv[]){
     res = fscanf(f, "%d", &nPTTS);
     res = fscanf(f, "%d", &nPTS);
     fclose(f);
+    
+    /* report ip */
+    int sockfd;
+    struct sockaddr_in dest;
+    MSG *buf_send = new MSG();
+    void *buf_recv = malloc(1 * sizeof(MSG));
+    buf_send->op = REGISTER_IP;
+    sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    bzero(&dest, sizeof(dest));
+    dest.sin_family = PF_INET;
+    dest.sin_port = htons(5566);
+    /******************/
+    //dest.sin_addr.s_addr = inet_addr(dnsseed);
+    dest.sin_addr = getdnsholderip(dnsholder); printf("%s\n", inet_ntoa(dest.sin_addr));
+    /******************/
+    connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+    send(sockfd, buf_send, sizeof(MSG), 0);
+    close(sockfd);
+    sleep(3);
+    /* request ip */
+    buf_send->op = REQUEST_IP;
+ 
 
     char confpath[270];
     strcpy(confpath, datadir);
@@ -286,7 +305,17 @@ int main(int argc, char *argv[]){
     fprintf(f, "fPNR=%d\n", fPNR);
     fprintf(f, "fPAMDB=%d\n", fPAMDB);
     fprintf(f, "nPTTS=%d\n", nPTTS);
-    fprintf(f, "nPTS=%d", nPTS);
+    fprintf(f, "nPTS=%d\n", nPTS);
+    int ipcnt = 0;
+    do{ fprintf(f, "\n");
+        sleep(1);
+
+        sockfd = socket(PF_INET, SOCK_STREAM, 0);
+        connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
+        findaddress(sockfd, buf_send, &buf_recv);
+        fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message);
+        ++ipcnt;
+    }while(ipcnt < 11);
     fclose(f);
 
     startnode(randseed, order, datadir);
