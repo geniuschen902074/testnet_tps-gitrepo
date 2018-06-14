@@ -1,11 +1,17 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <strings.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+/* getaddrinfo() */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 
 #define REGISTER_IP 1
 #define REQUEST_IP 2
