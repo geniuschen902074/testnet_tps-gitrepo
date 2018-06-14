@@ -410,6 +410,7 @@ static const string testnet_seeds[] = {"testnet-seed.alexykot.me",
 static const string *seeds = mainnet_seeds;
 
 vector<char*> BTC_ADDR;
+vector<char*> IP;
 extern "C" void* ThreadSeeder(void*) {
   srand(time(NULL));
 
@@ -452,9 +453,17 @@ extern "C" void* ThreadSeeder(void*) {
     switch( ((MSG *)buff_recv)->op ){
         case REGISTER_IP:{
             db.Add(CService(CNetAddr(client_addr.sin_addr), GetDefaultPort()), true);
+            char *ip = new char[128];
+            //strcpy(ip, ((MSG *)buff_recv)->message);
+            strcpy(ip, inet_ntoa(client_addr.sin_addr));
+            IP.push_back(ip);
             break;
         }
-        //case REQUEST_IP:
+        case REQUEST_IP:{
+            strcpy(buff_send->message, IP[rand() % (IP.size())]);
+            send(clientfd, buff_send, sizeof(MSG), 0);
+            break;
+        }
 
         case REGISTER_BTCADDR:{
             char *addr = new char[256] /*malloc(256 * sizeof(char))*/;

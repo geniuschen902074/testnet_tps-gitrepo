@@ -8,7 +8,7 @@
 #include <time.h>
 
 #define REGISTER_IP 1
-//#define REQUEST_IP 2
+#define REQUEST_IP 2
 #define REGISTER_BTCADDR 3
 #define REQUEST_BTCADDR 4
 
