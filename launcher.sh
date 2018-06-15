@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 9 ]; then
-	echo "usage: ./launcher.sh [(host)name of (machine)container where the dns seeder runs] seedname order txfee datadir fNoRetarget fAllowMinDiffBlk nTargetTimeSpan nTargetSpace"
+if [ "$#" -ne 12 ]; then
+	echo "usage: ./launcher.sh [(host)name of (machine)container where the dns seeder runs] seedname order txfee datadir fNoRetarget fAllowMinDiffBlk nTargetTimeSpan nTargetSpace seednum port rpcport"
 	exit 1
 fi
 
@@ -16,6 +16,10 @@ fPAMDB=$7
 nPTTS=$8
 nPTS=$9
 
+seednum=${10}
+port=${11}
+rpcport=${12}
+
 #set up static ip, NS record, etc
 
 #copy bitcoin-seeder/ to master container
@@ -25,7 +29,7 @@ nPTS=$9
 sleep 3
 
 g++ -std=c++11 launcher.cpp -o launcher
-./launcher $dnsholder $seedname $order $txfee $datadir $fPNR $fPAMDB $nPTTS $nPTS
+./launcher $dnsholder $seedname $order $txfee $datadir $fPNR $fPAMDB $nPTTS $nPTS $seednum $port $rpcport > setup
 cp setup Node/
 
 #copy Node/ to each client container's folder

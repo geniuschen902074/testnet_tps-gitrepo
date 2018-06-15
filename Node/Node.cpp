@@ -95,11 +95,13 @@ void node_monitor(int num_node){
 
 char dnsholder[256];
 char selfaddress[256];
-void findaddress(int sockfd, MSG *buf_send, void **buf_recv)
+int findaddress(int sockfd, MSG *buf_send, void **buf_recv)
 {
     send(sockfd, buf_send, sizeof(MSG), 0);
-    recv(sockfd, *buf_recv, sizeof(MSG), 0);
+    int res = recv(sockfd, *buf_recv, sizeof(MSG), 0);
     close(sockfd);
+    
+    return res;
 }
 struct in_addr getdnsholderip(char *dnsholder){
     
@@ -180,7 +182,7 @@ void matching(unsigned long long int randseed, unsigned int order)
     } while(1);
 }
 
-void startnode(unsigned long long int randseed, unsigned int order, char *datadir)
+void startnode(unsigned long long int randseed, unsigned int order, char *datadir,int port,int rpcport)
 {
 
     int sockfd;
@@ -198,7 +200,7 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
 
     /* run core */
     char command[280];
-    snprintf(command, 280, "./startnoderob.sh %s", datadir);//mintxfee, minrelaytxfee
+    snprintf(command, 280, "./startnoderob.sh %s %d %d", datadir, port, rpcport);//mintxfee, minrelaytxfee
     system(command);
     sleep(3);
     /* get BTC address */
@@ -257,6 +259,7 @@ int main(int argc, char *argv[]){
     double txfee;
     char datadir[256];
     int fPNR, fPAMDB, nPTTS, nPTS;
+    int seednum, port, rpcport;
     res = fscanf(f, "%s", dnsholder);
     res = fscanf(f, "%s", seedname);
     res = fscanf(f, "%llu", &randseed);
@@ -267,6 +270,9 @@ int main(int argc, char *argv[]){
     res = fscanf(f, "%d", &fPAMDB);
     res = fscanf(f, "%d", &nPTTS);
     res = fscanf(f, "%d", &nPTS);
+    res = fscanf(f, "%d", &seednum);
+    res = fscanf(f, "%d", &port);
+    res = fscanf(f, "%d", &rpcport);
     fclose(f);
     
     /* report ip */
@@ -275,6 +281,7 @@ int main(int argc, char *argv[]){
     MSG *buf_send = new MSG();
     void *buf_recv = malloc(1 * sizeof(MSG));
     buf_send->op = REGISTER_IP;
+    sprintf(buf_send->message, "%d", port);
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
     bzero(&dest, sizeof(dest));
     dest.sin_family = PF_INET;
@@ -289,6 +296,7 @@ int main(int argc, char *argv[]){
     sleep(3);
     /* request ip */
     buf_send->op = REQUEST_IP;
+    strcpy(buf_send->message, "");
  
 
     char confpath[270];
@@ -309,16 +317,18 @@ int main(int argc, char *argv[]){
     int ipcnt = 0;
     do{ fprintf(f, "\n");
         sleep(1);
+        int res;
 
         sockfd = socket(PF_INET, SOCK_STREAM, 0);
         connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
-        findaddress(sockfd, buf_send, &buf_recv);
-        fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message);
-        ++ipcnt;
-    }while(ipcnt < 11);
+        if((res = findaddress(sockfd, buf_send, &buf_recv)) > 0){
+            fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message); printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message);
+            ++ipcnt;
+        }
+    }while( ipcnt < seednum );
     fclose(f);
 
-    startnode(randseed, order, datadir);
+    startnode(randseed, order, datadir,port,rpcport);
 
 	
     return 0;	

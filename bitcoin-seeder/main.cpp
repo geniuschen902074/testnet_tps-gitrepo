@@ -455,7 +455,8 @@ extern "C" void* ThreadSeeder(void*) {
             db.Add(CService(CNetAddr(client_addr.sin_addr), GetDefaultPort()), true);
             char *ip = new char[128];
             //strcpy(ip, ((MSG *)buff_recv)->message);
-            strcpy(ip, inet_ntoa(client_addr.sin_addr));
+            //strcpy(ip, inet_ntoa(client_addr.sin_addr));
+            sprintf(ip, "%s:%s", inet_ntoa(client_addr.sin_addr), ((MSG *)buff_recv)->message);
             IP.push_back(ip);
             break;
         }
