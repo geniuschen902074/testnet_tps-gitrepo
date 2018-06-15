@@ -3,9 +3,10 @@
 #one argument: #node
 #dirarr=(A B C D E F G H I J)
 
-num_node=$1
+rpcport=$1
+num_node=$2
 
 for(( i=0 ; i<$((num_node)) ; i=$((i+1)) ))
 do
-	bitcoin-cli -rpcport=18332 -rpcuser=test -rpcpassword=test getnewaddress
+	bitcoin-cli -rpcport=$rpcport -rpcuser=test -rpcpassword=test getnewaddress
 done

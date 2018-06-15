@@ -1,5 +1,6 @@
 #!/bin/bash
 
-num_blk=$1
+rpcport=$1
+num_blk=$2
 
-bitcoin-cli -rpcport=18332 -rpcuser=test -rpcpassword=test getbestchaintps $num_blk
+bitcoin-cli -rpcport=$rpcport -rpcuser=test -rpcpassword=test getbestchaintps $num_blk

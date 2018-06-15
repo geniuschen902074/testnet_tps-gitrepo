@@ -94,6 +94,8 @@ void node_monitor(int num_node){
 //////////////////////////////////////////////////////////////
 
 char dnsholder[256];
+int port;
+int rpcport;
 char selfaddress[256];
 int findaddress(int sockfd, MSG *buf_send, void **buf_recv)
 {
@@ -136,7 +138,7 @@ struct in_addr getdnsholderip(char *dnsholder){
 double checkbalance()
 {
     FILE *fbl; char temp[32];
-    setshellcmdoutput(&fbl, 1);
+    setshellcmdoutput(&fbl, 1, rpcport);
     fgets(temp, 32, fbl); temp[strlen(temp)-1] = '\0'; fflush(fbl);pclose(fbl);
     return atof(temp);
 }
@@ -177,12 +179,12 @@ void matching(unsigned long long int randseed, unsigned int order)
         /* TODO fill in 4th parameter of sendMoney below according to balance */
         double balance = checkbalance();
         /* send the money */
-        //TODO setshellcmdoutput(NULL, 0, addr, 0.01);//paytxfee when running core?
+        //TODO setshellcmdoutput(NULL, 0, rpcport, addr, 0.01);//paytxfee when running core?
 
     } while(1);
 }
 
-void startnode(unsigned long long int randseed, unsigned int order, char *datadir,int port,int rpcport)
+void startnode(unsigned long long int randseed, unsigned int order, char *datadir)
 {
 
     int sockfd;
@@ -205,7 +207,7 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     sleep(3);
     /* get BTC address */
     FILE *fd;
-    setshellcmdoutput(&fd, 3, 1);
+    setshellcmdoutput(&fd, 3, rpcport, 1);
     fgets(selfaddress, 256, fd); selfaddress[strlen(selfaddress)-1] = '\0';//[pop_back]
     fflush(fd); pclose(fd); printf("%s\n", selfaddress);
     /* report BTC address */
@@ -237,14 +239,14 @@ int main(int argc, char *argv[]){
     int i = 0;
     for(i = 0; i < 8; i++)
         CMD[i] = new char[32];
-    strcpy(CMD[0], "./sendmoney.sh %s %.7f");
-    strcpy(CMD[1], "./checkbalance.sh");//atof
-    strcpy(CMD[2], "./mineblock.sh %d");//
-    strcpy(CMD[3], "./setaddress.sh %d");//(ascii string)
-    strcpy(CMD[4], "./txInmempool.sh");//atoi
-    strcpy(CMD[5], "./getchaintip.sh");//atoi (longest height -> #branch)
-    strcpy(CMD[6], "./settxfee.sh %d %.7f");
-    strcpy(CMD[7], "./getbestchaintps.sh %d");//science notation ascii string
+    strcpy(CMD[0], "./sendmoney.sh %d %s %.7f");
+    strcpy(CMD[1], "./checkbalance.sh %d");//atof
+    strcpy(CMD[2], "./mineblock.sh %d %d");//
+    strcpy(CMD[3], "./setaddress.sh %d %d");//(ascii string)
+    strcpy(CMD[4], "./txInmempool.sh %d");//atoi
+    strcpy(CMD[5], "./getchaintip.sh %d");//atoi (longest height -> #branch)
+    strcpy(CMD[6], "./settxfee.sh %d %d %.7f");
+    strcpy(CMD[7], "./getbestchaintps.sh %d %d");//science notation ascii string
 
 
     //std::thread monitor( node_monitor , num_node);//master node aside from the num_node nodes
@@ -259,7 +261,7 @@ int main(int argc, char *argv[]){
     double txfee;
     char datadir[256];
     int fPNR, fPAMDB, nPTTS, nPTS;
-    int seednum, port, rpcport;
+    int seednum;
     res = fscanf(f, "%s", dnsholder);
     res = fscanf(f, "%s", seedname);
     res = fscanf(f, "%llu", &randseed);
@@ -328,7 +330,7 @@ int main(int argc, char *argv[]){
     }while( ipcnt < seednum );
     fclose(f);
 
-    startnode(randseed, order, datadir,port,rpcport);
+    startnode(randseed, order, datadir);
 
 	
     return 0;	

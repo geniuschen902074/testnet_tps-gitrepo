@@ -1,7 +1,8 @@
 #!/bin/bash
 
-addr=$1
-ammount=$2
+rpcport=$1
+addr=$2
+ammount=$3
 
 #bitcoin-cli -rpcport=$(($pos+20001)) -rpcuser=test -rpcpassword=test sendtoaddress $addr $ammount
-bitcoin-cli -rpcport=18332 -rpcuser=test -rpcpassword=test sendtoaddress $addr $ammount
+bitcoin-cli -rpcport=$rpcport -rpcuser=test -rpcpassword=test sendtoaddress $addr $ammount
