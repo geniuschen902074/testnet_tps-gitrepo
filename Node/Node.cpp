@@ -246,7 +246,9 @@ int main(int argc, char *argv[]){
     strcpy(CMD[4], "./txInmempool.sh %d");//atoi
     strcpy(CMD[5], "./getchaintip.sh %d");//atoi (longest height -> #branch)
     strcpy(CMD[6], "./settxfee.sh %d %d %.7f");
-    strcpy(CMD[7], "./getbestchaintps.sh %d %d");//science notation ascii string
+    istrcpy(CMD[7], "./getbestchaintps.sh %d %d");//science notation ascii string
+    //in newer bitcoin, gettxoutsetinfo
+    //in newer bitcoin, getblockchaininfo
 
 
     //std::thread monitor( node_monitor , num_node);//master node aside from the num_node nodes
