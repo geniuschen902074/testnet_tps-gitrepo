@@ -17,6 +17,9 @@
 
 #include "seeding_msg.h"
 
+#define sendratio 0.0001
+#define minebound 1000.000000
+
 /*
 [1] sendtoaddress
 [2] getbalance(*)
@@ -179,7 +182,8 @@ void matching(unsigned long long int randseed, unsigned int order)
         /* TODO fill in 4th parameter of sendMoney below according to balance */
         double balance = checkbalance();
         /* send the money */
-        //TODO setshellcmdoutput(NULL, 0, rpcport, addr, 0.01);//paytxfee when running core?
+        /* TODO paytxfee when running core? */
+        setshellcmdoutput(NULL, 0, rpcport, addr, balance*sendratio);
 
     } while(1);
 }
@@ -226,6 +230,12 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     if(pid == 0){
         /* [when] balance, run */
         /* TODO mine the block */
+        do{
+            double balance = checkbalance();
+            if( balance < minebound )
+                setshellcmdoutput(NULL, 2, rpcport, 1);
+
+        } while(1);
         
         exit(0);
     }
@@ -246,7 +256,7 @@ int main(int argc, char *argv[]){
     strcpy(CMD[4], "./txInmempool.sh %d");//atoi
     strcpy(CMD[5], "./getchaintip.sh %d");//atoi (longest height -> #branch)
     strcpy(CMD[6], "./settxfee.sh %d %d %.7f");
-    istrcpy(CMD[7], "./getbestchaintps.sh %d %d");//science notation ascii string
+    strcpy(CMD[7], "./getbestchaintps.sh %d %d");//science notation ascii string
     //in newer bitcoin, gettxoutsetinfo
     //in newer bitcoin, getblockchaininfo
 
