@@ -99,6 +99,7 @@ void node_monitor(int num_node){
 //////////////////////////////////////////////////////////////
 
 char dnsholder[256];
+char ip[256];
 int port;
 int rpcport;
 char selfaddress[256];
@@ -287,6 +288,8 @@ int main(int argc, char *argv[]){
     res = fscanf(f, "%d", &nPTTS);
     res = fscanf(f, "%d", &nPTS);
     res = fscanf(f, "%d", &seednum);
+
+    res = fscanf(f, "%s", ip);
     res = fscanf(f, "%d", &port);
     res = fscanf(f, "%d", &rpcport);
     fclose(f);
@@ -340,13 +343,14 @@ int main(int argc, char *argv[]){
         connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
         if((res = findaddress(sockfd, buf_send, &buf_recv)) > 0){
             char *temp = ((MSG *)buf_recv)->message;
-            char *ip = strtok(temp, ":"); in_addr_t nip = inet_addr(ip);
-            char *port = strtok(NULL, ":"); uint16_t nport = htons(atoi(port));
+            char *cip = strtok(temp, ":"); in_addr_t nip = inet_addr(cip);
+            char *cport = strtok(NULL, ":"); uint16_t nport = htons(atoi(cport));
             std::pair<in_addr_t, uint16_t> p = std::make_pair(nip, nport);
             std::vector<std::pair<in_addr_t, uint16_t>>::iterator it = std::find(peerseeds.begin(), peerseeds.end(), p);
-            if(it == peerseeds.end()){
+            if(it == peerseeds.end() && (!strcmp(ip, cip) && port != atoi(cport))){
                 peerseeds.push_back(p);
-                fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message); printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message);
+                fprintf(f, "addnode=%s", ((MSG *)buf_recv)->message);
+                printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message); //fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message);
                 ++ipcnt;
             }
         }

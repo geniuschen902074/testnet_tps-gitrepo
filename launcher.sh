@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 12 ]; then
-	echo "usage: ./launcher.sh [(host)name of (machine)container where the dns seeder runs] seedname order txfee datadir fNoRetarget fAllowMinDiffBlk nTargetTimeSpan nTargetSpace seednum port rpcport"
+if [ "$#" -ne 13 ]; then
+	echo "usage: ./launcher.sh [(host)name of (machine)container where the dns seeder runs] seedname order txfee datadir fNoRetarget fAllowMinDiffBlk nTargetTimeSpan nTargetSpace seednum ip port rpcport"
 	exit 1
 fi
 
@@ -17,8 +17,9 @@ nPTTS=$8
 nPTS=$9
 
 seednum=${10}
-port=${11}
-rpcport=${12}
+ip=${11}
+port=${12}
+rpcport=${13}
 
 #set up static ip, NS record, etc
 
@@ -29,7 +30,7 @@ rpcport=${12}
 sleep 3
 
 g++ -std=c++11 launcher.cpp -o launcher
-./launcher $dnsholder $seedname $order $txfee $datadir $fPNR $fPAMDB $nPTTS $nPTS $seednum $port $rpcport > setup
+./launcher $dnsholder $seedname $order $txfee $datadir $fPNR $fPAMDB $nPTTS $nPTS $seednum $ip $port $rpcport > setup
 cp setup Node/
 
 #copy Node/ to each client container's folder
