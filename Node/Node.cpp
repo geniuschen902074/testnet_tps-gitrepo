@@ -335,6 +335,7 @@ int main(int argc, char *argv[]){
     fprintf(f, "nPTS=%d\n", nPTS);
     int ipcnt = 0;
     std::vector<std::pair<in_addr_t, uint16_t>> peerseeds;
+    char temp[256];
     do{ fprintf(f, "\n");
         sleep(1);
         int res;
@@ -342,7 +343,7 @@ int main(int argc, char *argv[]){
         sockfd = socket(PF_INET, SOCK_STREAM, 0);
         connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
         if((res = findaddress(sockfd, buf_send, &buf_recv)) > 0){
-            char *temp = ((MSG *)buf_recv)->message;
+            strcpy(temp, ((MSG *)buf_recv)->message);
             char *cip = strtok(temp, ":"); in_addr_t nip = inet_addr(cip);
             char *cport = strtok(NULL, ":"); uint16_t nport = htons(atoi(cport));
             std::pair<in_addr_t, uint16_t> p = std::make_pair(nip, nport);
