@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <algorithm>    // std::find
+#include <vector>       // std::vector
 #include <stdarg.h>
 #include <time.h>
 #include <random>
@@ -329,6 +331,7 @@ int main(int argc, char *argv[]){
     fprintf(f, "nPTTS=%d\n", nPTTS);
     fprintf(f, "nPTS=%d\n", nPTS);
     int ipcnt = 0;
+    std::vector<std::pair<in_addr_t, uint16_t>> peerseeds;
     do{ fprintf(f, "\n");
         sleep(1);
         int res;
@@ -336,8 +339,16 @@ int main(int argc, char *argv[]){
         sockfd = socket(PF_INET, SOCK_STREAM, 0);
         connect(sockfd, (struct sockaddr*)&dest, sizeof(dest));
         if((res = findaddress(sockfd, buf_send, &buf_recv)) > 0){
-            fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message); printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message);
-            ++ipcnt;
+            char *temp = ((MSG *)buf_recv)->message;
+            char *ip = strtok(temp, ":"); in_addr_t nip = inet_addr(ip);
+            char *port = strtok(NULL, ":"); uint16_t nport = htons(atoi(port));
+            std::pair<in_addr_t, uint16_t> p = std::make_pair(nip, nport);
+            std::vector<std::pair<in_addr_t, uint16_t>>::iterator it = std::find(peerseeds.begin(), peerseeds.end(), p);
+            if(it == peerseeds.end()){
+                peerseeds.push_back(p);
+                fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message); printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message);
+                ++ipcnt;
+            }
         }
     }while( ipcnt < seednum );
     fclose(f);
