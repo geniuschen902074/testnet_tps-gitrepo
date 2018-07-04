@@ -210,7 +210,7 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     char command[280];
     snprintf(command, 280, "./startnoderob.sh %s %d %d", datadir, port, rpcport);//mintxfee, minrelaytxfee
     system(command);
-    sleep(3);
+    sleep(15);
     /* get BTC address */
     FILE *fd;
     setshellcmdoutput(&fd, 3, rpcport, 1);
