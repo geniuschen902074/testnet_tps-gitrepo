@@ -347,7 +347,7 @@ int main(int argc, char *argv[]){
             char *cport = strtok(NULL, ":"); uint16_t nport = htons(atoi(cport));
             std::pair<in_addr_t, uint16_t> p = std::make_pair(nip, nport);
             std::vector<std::pair<in_addr_t, uint16_t>>::iterator it = std::find(peerseeds.begin(), peerseeds.end(), p);
-            if(it == peerseeds.end() && (!strcmp(ip, cip) || port != atoi(cport))){
+            if(it == peerseeds.end() && (strcmp(ip, cip) || port != atoi(cport))){
                 peerseeds.push_back(p);
                 fprintf(f, "addnode=%s", ((MSG *)buf_recv)->message);
                 printf("res %d cnt %d %s\n", res, ipcnt, ((MSG *)buf_recv)->message); //fprintf(f, "seednode=%s", ((MSG *)buf_recv)->message);
