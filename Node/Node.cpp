@@ -9,7 +9,8 @@
 #include <time.h>
 #include <random>
 #include <unistd.h>
-#include <sys/types.h>
+#include <sys/stat.h> //mkdir
+#include <sys/types.h> //mkdir
 #include <sys/wait.h>
 #include <signal.h>
 
@@ -358,6 +359,7 @@ int main(int argc, char *argv[]){
     }while( ipcnt < seednum );
     fclose(f);
 
+    if(mkdir(datadir, S_IRWXU | S_IRWXG | S_IRWXO) != 0) exit(0);
     startnode(randseed, order, datadir);
 
 	
