@@ -215,9 +215,12 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     sleep(15);
     /* get BTC address */
     FILE *fd;
-    setshellcmdoutput(&fd, 3, rpcport, 1);
-    fgets(selfaddress, 256, fd); selfaddress[strlen(selfaddress)-1] = '\0';//[pop_back]
-    fflush(fd); pclose(fd); printf("%s\n", selfaddress);
+    strcpy(selfaddress, "");
+    while( strcmp(selfaddress, "") ){
+        setshellcmdoutput(&fd, 3, rpcport, 1);
+        fgets(selfaddress, 256, fd); selfaddress[strlen(selfaddress)-1] = '\0';//[pop_back]
+        fflush(fd); pclose(fd); printf("%s\n", selfaddress);
+    }
     /* report BTC address */
     buf_send->op = REGISTER_BTCADDR;
     strcpy(buf_send->message, selfaddress); printf("%s\n", buf_send->message);
