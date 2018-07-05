@@ -319,6 +319,8 @@ int main(int argc, char *argv[]){
     strcpy(buf_send->message, "");
  
 
+    if(mkdir(datadir, S_IRWXU | S_IRWXG | S_IRWXO) != 0) exit(0);
+
     char confpath[270];
     strcpy(confpath, datadir);
     strcpy(&confpath[strlen(confpath)], "/bitcoin.conf");
@@ -359,7 +361,6 @@ int main(int argc, char *argv[]){
     }while( ipcnt < seednum );
     fclose(f);
 
-    if(mkdir(datadir, S_IRWXU | S_IRWXG | S_IRWXO) != 0) exit(0);
     startnode(randseed, order, datadir);
 
 	
