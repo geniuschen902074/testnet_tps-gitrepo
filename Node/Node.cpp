@@ -216,7 +216,7 @@ void startnode(unsigned long long int randseed, unsigned int order, char *datadi
     /* get BTC address */
     FILE *fd;
     strcpy(selfaddress, "");
-    while( strcmp(selfaddress, "") ){
+    while( !strcmp(selfaddress, "") ){
         setshellcmdoutput(&fd, 3, rpcport, 1);
         fgets(selfaddress, 256, fd); selfaddress[strlen(selfaddress)-1] = '\0';//[pop_back]
         fflush(fd); pclose(fd); printf("%s\n", selfaddress);
