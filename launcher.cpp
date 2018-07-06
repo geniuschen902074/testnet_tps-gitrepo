@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]){
 
-    if(argc != 14){
+    if(argc != 15){
         printf("parameter not enough\n");
         return 0;
     }
@@ -24,16 +24,17 @@ int main(int argc, char *argv[]){
     int fPAMDB = atoi(argv[7]);
     int nPTTS = atoi(argv[8]);
     int nPTS = atoi(argv[9]);
+    char *BITS = argv[10];
 
-    int seednum = atoi(argv[10]);
-    char *ip = argv[11];
-    int port = atoi(argv[12]);
-    int rpcport = atoi(argv[13]);
+    int seednum = atoi(argv[11]);
+    char *ip = argv[12];
+    int port = atoi(argv[13]);
+    int rpcport = atoi(argv[14]);
 
     //FILE *fp = fopen("setup", "w");
     //fprintf(fp, "%s\n%s\n%llu\n%u\n%.7f\n%s\n%d\n%d\n%d\n%d\n%d", dnsholder, seedname, randseed, order, txfee, datadir, fPNR, fPAMDB, nPTTS, nPTS, seednum);
     //fclose(fp);
-    printf("%s\n%s\n%llu\n%u\n%.7f\n%s\n%d\n%d\n%d\n%d\n%d\n%s\n%d\n%d", dnsholder, seedname, randseed, order, txfee, datadir, fPNR, fPAMDB, nPTTS, nPTS, seednum, ip, port, rpcport);
+    printf("%s\n%s\n%llu\n%u\n%.7f\n%s\n%d\n%d\n%d\n%d\n%d\n%s\n%d\n%d\n%s", dnsholder, seedname, randseed, order, txfee, datadir, fPNR, fPAMDB, nPTTS, nPTS, seednum, ip, port, rpcport, BITS);
 
     return 0;
 }

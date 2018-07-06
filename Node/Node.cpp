@@ -279,6 +279,7 @@ int main(int argc, char *argv[]){
     unsigned int order;
     double txfee;
     char datadir[256];
+    char BITS[16];
     int fPNR, fPAMDB, nPTTS, nPTS;
     int seednum;
     res = fscanf(f, "%s", dnsholder);
@@ -296,6 +297,7 @@ int main(int argc, char *argv[]){
     res = fscanf(f, "%s", ip);
     res = fscanf(f, "%d", &port);
     res = fscanf(f, "%d", &rpcport);
+    res = fscanf(f, "%s", BITS);
     fclose(f);
     
     /* report ip */
@@ -339,6 +341,7 @@ int main(int argc, char *argv[]){
     fprintf(f, "fPAMDB=%d\n", fPAMDB);
     fprintf(f, "nPTTS=%d\n", nPTTS);
     fprintf(f, "nPTS=%d\n", nPTS);
+    fprintf(f, "BITS=%s\n", BITS);
     int ipcnt = 0;
     std::vector<std::pair<in_addr_t, uint16_t>> peerseeds;
     char temp[256];
